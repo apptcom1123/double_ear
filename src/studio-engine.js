@@ -1,6 +1,14 @@
 import { AudioEngine } from './audio-engine.js';
 import { seededRandom } from './audio-utils.js';
 
+export function dopplerRatios(speedKmh) {
+  const metresPerSecond = Math.max(10, Math.min(140, Number(speedKmh))) / 3.6;
+  return { approach: 343 / (343 - metresPerSecond), recede: 343 / (343 + metresPerSecond) };
+}
+export function trafficOffsets(count, period, random = Math.random) {
+  return Array.from({ length: Math.max(1, Math.min(12, Math.round(count))) }, () => random() * period * .82).sort((a,b) => a-b);
+}
+
 export const materials = [
   { id: 'nebula', name: '星雲和弦', group: 'SPACE', note: '緩慢漂浮的寬幅和弦', type: 'pad', wave: 'sine', notes: [0,7,14,19], root: 110 },
   { id: 'engine', name: '深空引擎', group: 'SPACE', note: '低頻持續音與緩慢脈動', type: 'pad', wave: 'triangle', notes: [0,7,12], root: 55 },
@@ -23,7 +31,8 @@ export const materials = [
   { id: 'subatomic', name: '次原子振盪', group: 'MICRO', note: '五種微觀高速動態', tags: '微觀 量子 原子 昆蟲 high frequency', type: 'texture-micro', tempo: true, variants: [['quantum','量子跳躍'],['collision','原子碰撞'],['wings','微型翼振'],['cell','細胞脈衝'],['spark','奈米火花']] },
   { id: 'frog-choir', name: '蛙鳴群落', group: 'NATURE', note: '六種可切換的合成蛙鳴', tags: '蛙鳴 青蛙 池塘 frog', type: 'texture-frog', variants: [['bull','牛蛙'],['tree','樹蛙'],['rain','雨蛙'],['marsh','澤蛙'],['reed','葦澤蛙'],['glass','玻璃蛙']] },
   { id: 'mushroom-signals', name: '蘑菇訊號', group: 'BIO', note: '五種菌絲電訊號序列', tags: '蘑菇 菌絲 電磁 植物 mushroom', type: 'texture-mushroom', tempo: true, variants: [['mycelium','菌絲脈衝'],['spore','孢子雨'],['morel','羊肚菌碼'],['oyster','平菇波'],['glow','夜光菇']] },
-  { id: 'bianzhong', name: '五組編鐘', group: 'BELL', note: '五套固定音程與青銅泛音', tags: '編鐘 鐘磬 青銅 chinese bell', type: 'texture-bells', tempo: true, variants: [['gong','宮調'],['shang','商調'],['jue','角調'],['zhi','徵調'],['yu','羽調']] }
+  { id: 'bianzhong', name: '五組編鐘', group: 'BELL', note: '五套固定音程與青銅泛音', tags: '編鐘 鐘磬 青銅 chinese bell', type: 'texture-bells', tempo: true, variants: [['gong','宮調'],['shang','商調'],['jue','角調'],['zhi','徵調'],['yu','羽調']] },
+  { id: 'traffic-stage', name: '交通舞台', group: 'TRAFFIC', note: '隨機車流、行人與緊急車輛的都卜勒循環', tags: '交通 汽車 機車 行人 救護車 警車 traffic car motorcycle pedestrian ambulance police doppler', type: 'texture-traffic', variants: [['mixed','混合街道'],['car','汽車'],['motorcycle','機車'],['pedestrian','行人'],['ambulance','救護車'],['police','警車']] }
 ];
 
 export class StudioEngine {
@@ -117,7 +126,7 @@ export class StudioEngine {
         : layer.id === 'rhythm' ? [config.bpm,config.rhythm]
         : layer.id === 'radio' ? [layer.radioUrl ?? state.radioUrl]
         : [materials.find(item=>item.id===layer.id)?.tempo || materials.find(item=>item.id===layer.id)?.type === 'sequence' ? config.bpm : 0,
-          config.materialVariant, config.materialIntensity, config.materialMotion];
+          config.materialVariant, config.materialIntensity, config.materialMotion, config.trafficSpeed, config.trafficPeriod, config.trafficCount];
       const signature = JSON.stringify(relevant);
       const existing = this.channels.get(layer.id);
       if (!layer.enabled) {
@@ -355,6 +364,57 @@ export class StudioEngine {
       osc.type = type; osc.frequency.value = frequency; osc.detune.value = detune; gain.gain.value = level;
       osc.connect(gain).connect(destination); osc.start(); voice.track(osc, gain); return osc;
     };
+    if (material.type === 'texture-traffic') {
+      const period = Math.max(5, Math.min(30, config.trafficPeriod ?? 10));
+      const count = Math.max(1, Math.min(12, Math.round(config.trafficCount ?? 5)));
+      const speed = Math.max(10, Math.min(140, config.trafficSpeed ?? 50));
+      const kinds = ['car','motorcycle','pedestrian','ambulance','police'];
+      const removeTracked = nodes => { for (const node of nodes) { const index = voice.nodes.indexOf(node); if (index >= 0) voice.nodes.splice(index, 1); try { node.disconnect(); } catch {} } };
+      const schedulePass = (kind, start, direction) => {
+        const duration = kind === 'pedestrian' ? Math.max(3, Math.min(8, 10 - speed / 25)) : Math.max(1.35, Math.min(7, 190 / speed));
+        const vehicleGain = ctx.createGain(), pan = ctx.createStereoPanner(), filter = ctx.createBiquadFilter();
+        const peak = (.055 + intensity * .075) * (kind === 'motorcycle' ? .8 : 1);
+        vehicleGain.gain.setValueAtTime(.0001, start); vehicleGain.gain.exponentialRampToValueAtTime(peak, start + duration * .47); vehicleGain.gain.exponentialRampToValueAtTime(.0001, start + duration);
+        pan.pan.setValueAtTime(direction, start); pan.pan.linearRampToValueAtTime(-direction, start + duration);
+        filter.type = 'lowpass'; filter.frequency.value = kind === 'pedestrian' ? 900 : 650 + intensity * 1900;
+        vehicleGain.connect(filter).connect(pan).connect(bus);
+        const common = [vehicleGain, filter, pan]; voice.track(...common);
+        const finish = () => removeTracked(common);
+        if (kind === 'pedestrian') {
+          const steps = Math.max(6, Math.round(duration * 2.1));
+          for (let i = 0; i < steps; i++) {
+            const time = start + i * duration / steps, osc = ctx.createOscillator(), gain = ctx.createGain();
+            osc.type = 'sine'; osc.frequency.setValueAtTime(105 + random() * 45, time); osc.frequency.exponentialRampToValueAtTime(48, time + .09);
+            gain.gain.setValueAtTime(.0001,time);gain.gain.exponentialRampToValueAtTime(.065,time+.008);gain.gain.exponentialRampToValueAtTime(.0001,time+.12);osc.connect(gain).connect(vehicleGain);osc.start(time);osc.stop(time+.13);voice.track(osc,gain);osc.onended=()=>removeTracked([osc,gain]);
+          }
+          voice.timers.push(setTimeout(finish, Math.max(0,(start + duration - ctx.currentTime) * 1000 + 100)));
+          return;
+        }
+        const bases = { car:72, motorcycle:118, ambulance:84, police:96 }, base = bases[kind] || 72;
+        const { approach, recede } = dopplerRatios(speed);
+        const oscillators = [];
+        [1,2.03].forEach((ratio,index) => {
+          const osc=ctx.createOscillator(),gain=ctx.createGain();osc.type=index?'square':'sawtooth';osc.frequency.setValueAtTime(base*ratio*approach,start);osc.frequency.exponentialRampToValueAtTime(base*ratio,start+duration*.5);osc.frequency.exponentialRampToValueAtTime(base*ratio*recede,start+duration);gain.gain.value=index?.025:.065;osc.connect(gain).connect(vehicleGain);osc.start(start);osc.stop(start+duration+.03);voice.track(osc,gain);oscillators.push(osc,gain);
+        });
+        if (kind === 'ambulance' || kind === 'police') {
+          const siren=ctx.createOscillator(),sirenGain=ctx.createGain(),low=kind==='ambulance'?620:740,high=kind==='ambulance'?880:980,rate=kind==='ambulance'?.42:.24;
+          siren.type='sine';sirenGain.gain.value=.055+intensity*.035;
+          for(let time=start,toggle=false;time<start+duration;time+=rate,toggle=!toggle){siren.frequency.setValueAtTime((toggle?high:low)*approach,time);siren.frequency.linearRampToValueAtTime((toggle?low:high)*(time<start+duration*.5?approach:recede),Math.min(start+duration,time+rate));}
+          siren.connect(sirenGain).connect(vehicleGain);siren.start(start);siren.stop(start+duration+.03);voice.track(siren,sirenGain);oscillators.push(siren,sirenGain);
+        }
+        oscillators[0].onended = () => removeTracked([...common,...oscillators]);
+      };
+      let cycleStart = ctx.currentTime + .08;
+      const scheduleCycle = () => {
+        cycleStart = Math.max(cycleStart, ctx.currentTime + .05);
+        const offsets = trafficOffsets(count, period, random);
+        offsets.forEach(offset => { const kind = variant === 'mixed' ? kinds[Math.floor(random()*kinds.length)] : variant; schedulePass(kind, cycleStart + offset, random()>.5 ? -1 : 1); });
+        cycleStart += period;
+      };
+      scheduleCycle();
+      voice.timers.push(setInterval(() => { if (voice.playing) scheduleCycle(); }, period * 1000));
+      return;
+    }
     if (material.type === 'texture-cyber') {
       const profiles = { neon:[43.65,420,'sawtooth'], factory:[35,260,'square'], siren:[58,720,'sawtooth'], drone:[29,180,'triangle'], storm:[73,1200,'square'] };
       const [root,cutoff,wave] = profiles[variant] || profiles.neon;

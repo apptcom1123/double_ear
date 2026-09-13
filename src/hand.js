@@ -12,6 +12,7 @@ export class Hand {
     for (const layer of state.layers) {
       layer.config ??= structuredClone(state.config); layer.eq ??= defaultEQ();
       layer.config.materialIntensity ??= .5; layer.config.materialMotion ??= .45;
+      layer.config.trafficSpeed ??= 50; layer.config.trafficPeriod ??= 10; layer.config.trafficCount ??= 5;
       const template = this.catalogue.find(item => item.id === layer.id);
       layer.config.materialVariant ??= template?.variants?.[0]?.[0] || '';
       if (!state.handIds.includes(layer.id)) layer.enabled = false;
@@ -79,7 +80,13 @@ export class Hand {
           input.oninput = e => { selected.config[key] = Number(e.target.value); label.querySelector('output').textContent = `${Math.round(selected.config[key] * 100)}%`; clearTimeout(this.materialUpdate); this.materialUpdate = setTimeout(() => this.studio.update(), 70); };
           input.onchange = () => { clearTimeout(this.materialUpdate); this.studio.update(); }; grid.append(label);
         }
-        controls.querySelector('#randomize-material').onclick = () => { selected.config.materialIntensity = .2 + Math.random() * .8; selected.config.materialMotion = Math.random(); if (material.variants) selected.config.materialVariant = material.variants[Math.floor(Math.random() * material.variants.length)][0]; this.studio.update(); this.studio.render(root); };
+        if (material.type === 'texture-traffic') {
+          for (const [key,name,min,max,step,unit] of [['trafficSpeed','速度',10,140,1,' km/h'],['trafficPeriod','週期',5,30,1,' 秒'],['trafficCount','數量',1,12,1,' 個']]) {
+            const label = document.createElement('label'); label.className = 'control traffic-control'; label.innerHTML = `<span class="control-head">${name}<output>${selected.config[key]}${unit}</output></span><input type="range" min="${min}" max="${max}" step="${step}" value="${selected.config[key]}">`;
+            const input = label.querySelector('input'); input.oninput = e => { selected.config[key] = Number(e.target.value); label.querySelector('output').textContent = `${selected.config[key]}${unit}`; clearTimeout(this.materialUpdate); this.materialUpdate = setTimeout(() => this.studio.update(), 90); }; input.onchange = () => { clearTimeout(this.materialUpdate); this.studio.update(); }; grid.append(label);
+          }
+        }
+        controls.querySelector('#randomize-material').onclick = () => { selected.config.materialIntensity = .2 + Math.random() * .8; selected.config.materialMotion = Math.random(); if (material.variants) selected.config.materialVariant = material.variants[Math.floor(Math.random() * material.variants.length)][0]; if (material.type === 'texture-traffic') { selected.config.trafficSpeed = 25 + Math.round(Math.random() * 85); selected.config.trafficCount = 2 + Math.floor(Math.random() * 7); } this.studio.update(); this.studio.render(root); };
         editor.querySelector('.spectrum-panel').before(controls);
       }
     }
