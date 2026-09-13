@@ -3,6 +3,7 @@ import { arpeggioStyles, getPage } from './experiments.js';
 import { carrierStack, clamp } from './audio-utils.js';
 import { Equalizer, defaultEQ } from './equalizer.js';
 import { Library } from './library.js';
+import { Hand } from './hand.js';
 
 export class Studio {
   constructor(onPlay) {
@@ -22,6 +23,7 @@ export class Studio {
       ]
     };
     this.tracks = [];
+    this.hand = new Hand(this);
     this.library = new Library(this);
     this.engine.onRadioStatus = text => { const el=document.querySelector('#radio-status'); if(el) el.textContent=text; };
   }
@@ -42,6 +44,7 @@ export class Studio {
     this.equalizer?.destroy();
     this.state.eq??=defaultEQ();
     this.state.config.extraCarriers??=[];
+    this.hand.prepare();
     root.innerHTML = `<section class="studio-heading"><div><span class="eyebrow">06 / SOUND DESK</span><h1>把聲音，疊成你的空間。</h1></div><label class="scene-select">場景<select id="studio-scene"><option value="">自訂混音</option><option value="orbit">深空電台</option><option value="night">午夜街機</option><option value="garden">漂浮花園</option><option value="shaman">薩滿聲景</option></select></label></section>
       <section class="studio-dials" id="studio-dials"></section>
       <section class="sound-desk"><div class="section-head"><h2>聲音素材</h2><p>點一下開關 · 上下拖曳／滾輪調音量 · 方向鍵微調</p></div><div class="sound-grid" id="sound-grid"></div></section>
@@ -58,7 +61,7 @@ export class Studio {
       ['bpm','主節拍','BPM',40,160,1,[60,80,120,128]]
     ];
     for(const [key,name,unit,min,max,step,stops] of dials) {
-      const element=document.createElement('div'); element.className='studio-dial';
+      const element=document.createElement('div'); element.className='studio-dial'; element.dataset.parameter=key;
       element.innerHTML=`<label for="dial-${key}">${name}<span><output>${this.state.config[key]}</output> ${unit}</span></label><input id="dial-${key}" type="range" min="${min}" max="${max}" step="${step}" value="${this.state.config[key]}" list="stops-${key}"><datalist id="stops-${key}">${stops.map(v=>`<option value="${v}"></option>`).join('')}</datalist><div class="dial-stops">${stops.map(v=>`<button type="button" data-value="${v}" aria-label="${name} ${v} ${unit}">${v}</button>`).join('')}</div>`;
       const input=element.querySelector('input');
       const apply=value=>{this.state.config[key]=Number(value);input.value=value;element.querySelector('output').textContent=value;if(key==='carrier')this.renderCarriers();this.update();};
@@ -71,7 +74,7 @@ export class Studio {
     root.querySelector('#studio-dials').after(stack);
     stack.open=this.state.config.extraCarriers.length>0;
     this.renderCarriers();
-    for(const layer of this.state.layers) this.card(root,layer);
+    // Compact hand cards are mounted after the parameter editors.
     const options = [
       ['waveform','載波波形',[['sine','正弦'],['square','方波']]],
       ['noise','噪音頻譜',[['brown','棕噪音'],['green','綠噪音'],['white','白噪音']]],
@@ -79,21 +82,22 @@ export class Studio {
       ['rhythm','專用錯拍比例',['3:4','3:7','4:7','5:7'].map(v=>[v,v])]
     ];
     options.forEach(([key,label,values])=>{
-      const el=document.createElement('label');el.className='select-control';
+      const el=document.createElement('label');el.className='select-control';el.dataset.parameter=key;
       el.innerHTML=`${label}<select>${values.map(([id,text])=>`<option value="${id}">${text}</option>`).join('')}</select>`;
       el.querySelector('select').value=this.state.config[key];
       el.querySelector('select').onchange=e=>{this.state.config[key]=e.target.value;this.update();};
       root.querySelector('#studio-details').append(el);
     });
     [['swing','差頻擺幅',0,3,.1],['motionRate','空間移動 Hz',0,7,.05],['motionDepth','空間深度',0,1,.01],['arpeggioRoot','琶音根音 Hz',440,1400,1]].forEach(([key,label,min,max,step])=>{
-      const el=document.createElement('label');el.className='control';
+      const el=document.createElement('label');el.className='control';el.dataset.parameter=key;
       el.innerHTML=`<span class="control-head">${label}<output>${this.state.config[key]}</output></span><input type="range" min="${min}" max="${max}" step="${step}" value="${this.state.config[key]}">`;
       el.querySelector('input').oninput=e=>{this.state.config[key]=Number(e.target.value);el.querySelector('output').textContent=e.target.value;this.update();};
       root.querySelector('#studio-details').append(el);
     });
     root.querySelector('#radio-search').oninput=()=>this.renderTracks();
-    root.querySelector('#radio-track').onchange=e=>{this.state.radioUrl=e.target.value;this.update();};
+    root.querySelector('#radio-track').onchange=e=>{this.state.radioUrl=e.target.value;const radio=this.state.layers.find(layer=>layer.id==='radio');if(radio)radio.radioUrl=e.target.value;this.update();};
     root.querySelector('#studio-scene').onchange=e=>this.scene(e.target.value,root);
+    this.hand.mount(root);
     this.loadTracks();
   }
   renderCarriers() {
@@ -161,6 +165,7 @@ export class Studio {
   scene(id,root) {
     const settings={orbit:['nebula','engine','radio'],night:['tape','arcade','radio'],garden:['carrier','noise','arp','nebula'],shaman:['frame-drum','seed-rattle','overtone-chant','ritual-bell']}[id];
     if(!settings)return;
+    this.state.handIds = [...settings];
     this.state.layers.forEach(layer=>{layer.enabled=settings.includes(layer.id);});
     this.update();this.render(root);
     root.querySelector('#studio-scene').value=id;

@@ -84,4 +84,5 @@ export const pages = [
   }
 ];
 
+pages.push({ id: 'perform', step: '07', short: '演奏', title: '聲卡演奏台', summary: '四個基底聲卡槽、迷你鍵盤與 90 秒操作錄製。', config: { ...base } });
 export const getPage = (id) => pages.find((page) => page.id === id) || pages[0];

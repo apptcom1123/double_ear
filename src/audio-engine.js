@@ -19,6 +19,8 @@ export class AudioEngine {
     if (!AudioContextClass) throw new Error("此瀏覽器不支援 Web Audio API");
     if (!this.context) {
       this.context = new AudioContextClass({ latencyHint: "interactive" });
+    }
+    if (!this.master) {
       this.master = this.context.createGain();
       this.compressor = this.context.createDynamicsCompressor();
       this.compressor.threshold.value = -12;
@@ -26,7 +28,7 @@ export class AudioEngine {
       this.compressor.ratio.value = 8;
       this.compressor.attack.value = 0.005;
       this.compressor.release.value = 0.18;
-      this.master.connect(this.compressor).connect(this.context.destination);
+      this.master.connect(this.compressor).connect(this.destination || this.context.destination);
       this.master.gain.value = 0;
     }
     if (this.context.state === "suspended") await this.context.resume();

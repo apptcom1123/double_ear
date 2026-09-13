@@ -68,7 +68,7 @@ export class Equalizer {
     // Preview uses the same biquad response as the live signal chain.
     const frequencies=Float32Array.from({length:256},(_,i)=>xFrequency(i/255));
     const gains=new Float32Array(256),magnitude=new Float32Array(256),phase=new Float32Array(256);
-    for(const filter of engine.playing?engine.eqFilters:this.previewFilters){filter.getFrequencyResponse(frequencies,magnitude,phase);for(let i=0;i<256;i++)gains[i]+=20*Math.log10(Math.max(1e-8,magnitude[i]));}
+    for(const filter of engine.playing && engine.eqFilters.length ? engine.eqFilters : this.previewFilters){filter.getFrequencyResponse(frequencies,magnitude,phase);for(let i=0;i<256;i++)gains[i]+=20*Math.log10(Math.max(1e-8,magnitude[i]));}
     c.strokeStyle='#ef6a47';c.lineWidth=2;c.beginPath();for(let i=0;i<256;i++){const px=left+i/255*width,py=y(clamp(gains[i],-12,12));if(i===0)c.moveTo(px,py);else c.lineTo(px,py);}c.stroke();
     this.studio.state.eq.bands.forEach((band,i)=>{const point=this.points[i];point.style.left=`${x(band.frequency)}px`;point.style.top=`${y(band.gain)}px`;point.classList.toggle('selected',i===this.selected);point.title=`${band.frequency} Hz / ${band.gain} dB / Q ${band.q}`;});
     this.root.querySelector('#eq-status').textContent=engine.playing&&engine.output.context.state==='running'?'LIVE':'待播放';

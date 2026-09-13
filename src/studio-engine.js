@@ -11,7 +11,15 @@ export const materials = [
   { id: 'frame-drum', name: '薩滿框鼓', group: 'SHAMAN', note: '深沉皮鼓與四拍呼吸', type: 'shaman-drum', tempo: true },
   { id: 'seed-rattle', name: '種籽沙鈴', group: 'SHAMAN', note: '細碎顆粒環繞移動', type: 'shaman-rattle', tempo: true },
   { id: 'overtone-chant', name: '泛音吟唱', group: 'SHAMAN', note: '低沉持續音與泛音漂移', type: 'shaman-drone' },
-  { id: 'ritual-bell', name: '儀式金屬鈴', group: 'SHAMAN', note: '非整數泛音與長尾回聲', type: 'shaman-bell', tempo: true }
+  { id: 'ritual-bell', name: '儀式金屬鈴', group: 'SHAMAN', note: '非整數泛音與長尾回聲', type: 'shaman-bell', tempo: true },
+  { id: 'cyber-dystopia', name: '反烏托邦低鳴', group: 'CYBER', note: '工業失真與機械低鳴', tags: '賽博龐克 霓虹 機械 industrial distortion', type: 'texture-cyber' },
+  { id: 'glitch-grains', name: '破碎微粒', group: 'GLITCH', note: '凍結與水晶數位碎片', tags: '故障 顆粒 grains freeze crystal', type: 'texture-glitch', tempo: true },
+  { id: 'vhs-lofi', name: 'VHS 暖霧', group: 'LO-FI', note: '錄音帶抖晃與高頻衰減', tags: '復古 懷舊 蒸汽波 wow flutter tape', type: 'texture-lofi' },
+  { id: 'geological', name: '地層共振', group: 'EARTH', note: '岩石摩擦、地震低鳴與洞穴回音', tags: '地質 礦物 岩石 洞穴 resonance cave', type: 'texture-geology' },
+  { id: 'subatomic', name: '次原子振盪', group: 'MICRO', note: '微小高速碰撞與昆蟲翼振', tags: '微觀 量子 原子 昆蟲 high frequency', type: 'texture-micro', tempo: true },
+  { id: 'frog-choir', name: '四蛙合唱', group: 'NATURE', note: '四種可切換的合成蛙鳴', tags: '蛙鳴 青蛙 池塘 frog', type: 'texture-frog', variants: [['bull','牛蛙'],['tree','樹蛙'],['rain','雨蛙'],['marsh','澤蛙']] },
+  { id: 'mushroom-signals', name: '蘑菇訊號', group: 'BIO', note: '五種菌絲電訊號序列', tags: '蘑菇 菌絲 電磁 植物 mushroom', type: 'texture-mushroom', tempo: true, variants: [['mycelium','菌絲脈衝'],['spore','孢子雨'],['morel','羊肚菌碼'],['oyster','平菇波'],['glow','夜光菇']] },
+  { id: 'bianzhong', name: '四組編鐘', group: 'BELL', note: '四套固定音程與青銅泛音', tags: '編鐘 鐘磬 青銅 chinese bell', type: 'texture-bells', tempo: true, variants: [['gong','宮調'],['shang','商調'],['jue','角調'],['yu','羽調']] }
 ];
 
 export class StudioEngine {
@@ -37,12 +45,23 @@ export class StudioEngine {
     this.analyser = ctx.createAnalyser();
     this.analyser.fftSize = 8192; this.analyser.smoothingTimeConstant = .8;
     this.output.compressor.disconnect();
-    this.output.compressor.connect(this.analyser).connect(ctx.destination);
+    this.output.compressor.connect(this.analyser).connect(this.output.destination || ctx.destination);
   }
   setEQ(eq) {
     if (!this.eqFilters.length || !eq) return;
     eq.bands.forEach((band, i) => {
       const filter = this.eqFilters[i]; if (!filter) return;
+      const now = this.output.context.currentTime;
+      filter.frequency.setTargetAtTime(band.frequency, now, .035);
+      filter.gain.setTargetAtTime(eq.enabled ? band.gain : 0, now, .035);
+      filter.Q.setTargetAtTime(band.q, now, .035);
+    });
+  }
+  setLayerEQ(id, eq) {
+    const channel = this.channels.get(id);
+    if (!channel?.filters || !eq) return;
+    eq.bands.forEach((band, i) => {
+      const filter = channel.filters[i]; if (!filter) return;
       const now = this.output.context.currentTime;
       filter.frequency.setTargetAtTime(band.frequency, now, .035);
       filter.gain.setTargetAtTime(eq.enabled ? band.gain : 0, now, .035);
@@ -83,14 +102,18 @@ export class StudioEngine {
   async update(state) {
     if (!this.playing) return;
     this.setEQ(state.eq);
-    const config = { ...state.config };
+    for (const [id, channel] of this.channels) {
+      if (!state.layers.some(layer => layer.id === id)) { this.dispose(channel); this.channels.delete(id); }
+    }
     for (const layer of state.layers) {
+      const config = { ...state.config, ...layer.config };
       const relevant = layer.id === 'carrier' ? [config.carrier,config.extraCarriers,config.beat,config.swing,config.waveform,config.motionRate,config.motionDepth]
         : layer.id === 'noise' ? [config.noise]
         : layer.id === 'arp' ? [config.arpeggio, config.arpeggioRoot]
         : layer.id === 'rhythm' ? [config.bpm,config.rhythm]
-        : layer.id === 'radio' ? [state.radioUrl]
-        : [materials.find(item=>item.id===layer.id)?.tempo || materials.find(item=>item.id===layer.id)?.type === 'sequence' ? config.bpm : 0];
+        : layer.id === 'radio' ? [layer.radioUrl ?? state.radioUrl]
+        : [materials.find(item=>item.id===layer.id)?.tempo || materials.find(item=>item.id===layer.id)?.type === 'sequence' ? config.bpm : 0,
+          config.materialVariant, config.materialIntensity, config.materialMotion];
       const signature = JSON.stringify(relevant);
       const existing = this.channels.get(layer.id);
       if (!layer.enabled) {
@@ -100,6 +123,7 @@ export class StudioEngine {
       }
       if (existing?.signature === signature) {
         existing.bus.gain.setTargetAtTime(layer.level, this.output.context.currentTime, .04);
+        this.setLayerEQ(layer.id, layer.eq);
         continue;
       }
       this.dispose(existing);
@@ -110,15 +134,25 @@ export class StudioEngine {
       const voice = new AudioEngine();
       voice.context = context;
       voice.playing = true;
-      const channel = { bus, voice, signature };
+      const input = context.createGain(), filters = [];
+      let tail = input;
+      for (let i = 0; i < 5; i++) {
+        const filter = context.createBiquadFilter(); filter.type = 'peaking'; filter.gain.value = 0;
+        tail.connect(filter); tail = filter; filters.push(filter);
+      }
+      const analyser = context.createAnalyser(); analyser.fftSize = 8192;
+      tail.connect(analyser).connect(bus); voice.track(input, ...filters, analyser);
+      const channel = { bus, voice, signature, filters, analyser, input };
       this.channels.set(layer.id, channel);
+      this.setLayerEQ(layer.id, layer.eq);
+      voice.materialConfig = config;
       const full = { ...config, binauralLevel: 1, noiseLevel: 1, arpeggioLevel: 1, rhythmLevel: 1 };
-      if (layer.id === 'carrier') voice.createBinaural(full, bus);
-      else if (layer.id === 'noise') voice.createNoise(full, bus, seededRandom(783));
-      else if (layer.id === 'arp') voice.createArpeggio(full, bus, seededRandom(783));
-      else if (layer.id === 'rhythm') voice.createRhythm(full, bus);
-      else if (layer.id === 'radio') this.loadRadio(state.radioUrl, channel, layer.id);
-      else this.synth(materials.find(item=>item.id===layer.id), voice, bus, config.bpm);
+      if (layer.id === 'carrier') voice.createBinaural(full, input);
+      else if (layer.id === 'noise') voice.createNoise(full, input, seededRandom(config.seed || 783));
+      else if (layer.id === 'arp') voice.createArpeggio(full, input, seededRandom(config.seed || 783));
+      else if (layer.id === 'rhythm') voice.createRhythm(full, input);
+      else if (layer.id === 'radio') this.loadRadio(layer.radioUrl ?? state.radioUrl, channel, layer.id);
+      else this.synth(materials.find(item=>item.id===layer.id), voice, input, config.bpm);
       bus.gain.setTargetAtTime(layer.level, context.currentTime, .12);
     }
   }
@@ -141,7 +175,7 @@ export class StudioEngine {
       const filter = this.output.context.createBiquadFilter();
       filter.type = 'bandpass'; filter.frequency.value = 1300; filter.Q.value = .45;
       source.buffer = buffer; source.loop = true;
-      source.connect(filter).connect(channel.bus);
+      source.connect(filter).connect(channel.input);
       channel.voice.track(source, filter);
       source.start();
       this.onRadioStatus?.('廣播播放中 · 循環');
@@ -249,6 +283,10 @@ export class StudioEngine {
       this.shamanSynth(material, voice, bus, bpm);
       return;
     }
+    if (material.type.startsWith('texture-')) {
+      this.textureSynth(material, voice, bus, bpm);
+      return;
+    }
     const ctx = voice.context;
     const filter = ctx.createBiquadFilter();
     filter.type = 'lowpass'; filter.frequency.value = material.id === 'tape' ? 1100 : 3800;
@@ -288,5 +326,75 @@ export class StudioEngine {
       };
       schedule(); voice.timers.push(setInterval(schedule,50));
     }
+  }
+
+  textureSynth(material, voice, bus, bpm) {
+    const ctx = voice.context;
+    const config = voice.materialConfig || {};
+    const intensity = Math.max(.05, Math.min(1, config.materialIntensity ?? .5));
+    const motion = Math.max(0, Math.min(1, config.materialMotion ?? .45));
+    const random = seededRandom(811 + material.id.length * 37);
+    const delay = ctx.createDelay(2), feedback = ctx.createGain(), wet = ctx.createGain();
+    delay.delayTime.value = material.type === 'texture-geology' ? .62 : .19 + motion * .23;
+    feedback.gain.value = material.type === 'texture-geology' ? .54 : .18 + motion * .2;
+    wet.gain.value = .18 + motion * .18;
+    bus.connect(delay); delay.connect(feedback).connect(delay); delay.connect(wet).connect(bus);
+    voice.track(delay, feedback, wet);
+    const curve = amount => {
+      const values = new Float32Array(1024);
+      for (let i = 0; i < values.length; i++) { const x = i * 2 / (values.length - 1) - 1; values[i] = Math.tanh(x * amount); }
+      return values;
+    };
+    const persistentTone = (frequency, type, level, destination = bus, detune = 0) => {
+      const osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.type = type; osc.frequency.value = frequency; osc.detune.value = detune; gain.gain.value = level;
+      osc.connect(gain).connect(destination); osc.start(); voice.track(osc, gain); return osc;
+    };
+    if (material.type === 'texture-cyber') {
+      const shaper = ctx.createWaveShaper(), filter = ctx.createBiquadFilter(), lfo = ctx.createOscillator(), sweep = ctx.createGain();
+      shaper.curve = curve(3 + intensity * 20); shaper.oversample = '4x'; filter.type = 'lowpass'; filter.frequency.value = 420 + intensity * 1050; filter.Q.value = 8;
+      lfo.frequency.value = .12 + motion * 1.2; sweep.gain.value = 180 + motion * 520; lfo.connect(sweep).connect(filter.frequency);
+      shaper.connect(filter).connect(bus); persistentTone(43.65,'sawtooth',.1,shaper,-8); persistentTone(55,'square',.055,shaper,7); lfo.start(); voice.track(shaper,filter,lfo,sweep); return;
+    }
+    if (material.type === 'texture-lofi') {
+      const filter = ctx.createBiquadFilter(), shaper = ctx.createWaveShaper(); filter.type='lowpass'; filter.frequency.value=900+intensity*1700; shaper.curve=curve(1.5+intensity*3);
+      shaper.connect(filter).connect(bus); voice.track(filter,shaper);
+      [110,164.81,220].forEach((frequency,i)=>{ const osc=persistentTone(frequency,i===1?'triangle':'sawtooth',.035,shaper); const wow=ctx.createOscillator(),depth=ctx.createGain(); wow.frequency.value=.12+i*.07+motion*.18; depth.gain.value=5+motion*18; wow.connect(depth).connect(osc.detune); wow.start(); voice.track(wow,depth); }); return;
+    }
+    if (material.type === 'texture-geology') {
+      const filter=ctx.createBiquadFilter(); filter.type='lowpass'; filter.frequency.value=160+intensity*260; filter.Q.value=9; filter.connect(bus); voice.track(filter);
+      persistentTone(28,'sine',.13,filter); persistentTone(41.2,'triangle',.055,filter);
+      const buffer=ctx.createBuffer(1,ctx.sampleRate*2,ctx.sampleRate),data=buffer.getChannelData(0); let brown=0;
+      for(let i=0;i<data.length;i++){brown=(brown+(random()*2-1)*.025)/1.025;data[i]=brown*2.6;}
+      const source=ctx.createBufferSource(), gain=ctx.createGain();source.buffer=buffer;source.loop=true;gain.gain.value=.07+intensity*.07;source.connect(gain).connect(filter);source.start();voice.track(source,gain);return;
+    }
+    const variant = config.materialVariant || material.variants?.[0]?.[0] || '';
+    const profiles = {
+      bull:[95,1.7,.72], tree:[720,2.7,.24], rain:[430,3.5,.19], marsh:[260,2.2,.34]
+    };
+    const bellSets = { gong:[261.63,329.63,392,523.25], shang:[293.66,369.99,440,587.33], jue:[329.63,415.3,493.88,659.25], yu:[392,493.88,587.33,783.99] };
+    const mushroomSets = { mycelium:[0,7,12,19,24], spore:[24,19,31,14,26], morel:[0,3,10,6,17], oyster:[0,12,5,17,9], glow:[12,24,19,31,36] };
+    let next=ctx.currentTime+.05, step=0;
+    const burst=(frequency,time,duration,level,type='sine',endFrequency=frequency,pan=0)=>{
+      const osc=ctx.createOscillator(),gain=ctx.createGain(),panner=ctx.createStereoPanner(); osc.type=type;osc.frequency.setValueAtTime(frequency,time);
+      if(endFrequency!==frequency)osc.frequency.exponentialRampToValueAtTime(Math.max(20,endFrequency),time+duration*.78);
+      gain.gain.setValueAtTime(.0001,time);gain.gain.exponentialRampToValueAtTime(level,time+.006);gain.gain.exponentialRampToValueAtTime(.0001,time+duration);panner.pan.value=pan;
+      osc.connect(gain).connect(panner).connect(bus);osc.start(time);osc.stop(time+duration+.02);osc.onended=()=>{osc.disconnect();gain.disconnect();panner.disconnect();};
+    };
+    const schedule=()=>{while(voice.playing&&next<ctx.currentTime+.18){
+      if(material.type==='texture-glitch'){
+        const duration=.012+random()*(.025+motion*.08), frequency=520+random()*5200;
+        burst(frequency,next,duration,.025+intensity*.065,random()>.5?'square':'sawtooth',frequency*(random()>.5?.4:1.8),random()*1.8-.9); next+=.025+random()*(.24-motion*.16);
+      } else if(material.type==='texture-micro'){
+        const frequency=2800+random()*7600;burst(frequency,next,.018+random()*.06,.018+intensity*.04,'sine',frequency*(.8+random()*.5),Math.sin(step++*1.7)*.9);next+=60/bpm/(3+motion*8);
+      } else if(material.type==='texture-frog'){
+        const [root,rate,duration]=profiles[variant]||profiles.bull;burst(root*(.92+random()*.12),next,duration,.06+intensity*.09,'sine',root*rate,Math.sin(step++*.9)*motion*.75);burst(root*1.04,next+.04,duration*.72,.025+intensity*.035,'square',root*rate*.82);next+=.65+(1-motion)*1.5+random()*.6;
+      } else if(material.type==='texture-mushroom'){
+        const notes=mushroomSets[variant]||mushroomSets.mycelium, frequency=220*2**(notes[step++%notes.length]/12);burst(frequency,next,.055+motion*.15,.035+intensity*.06,'square',frequency,Math.sin(step*.8)*.7);next+=60/bpm/(2+motion*4);
+      } else if(material.type==='texture-bells'){
+        const notes=bellSets[variant]||bellSets.gong, root=notes[step++%notes.length];[1,2.73,5.41].forEach((ratio,i)=>burst(root*ratio,next,.9+i*.22,[.08,.035,.018][i]*(.5+intensity),'sine',root*ratio,i===1?-.28:.22));next+=60/bpm*(1.2-motion*.55);
+      }
+    }};
+    schedule();voice.timers.push(setInterval(schedule,45));
   }
 }
