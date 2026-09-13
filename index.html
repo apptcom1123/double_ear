@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f4f1e8" />
+    <title>雙耳聲音實驗室</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#/">DOUBLE EAR <span>聲音實驗室</span></a>
+      <nav id="main-nav" aria-label="實驗頁面"></nav>
+      <button id="audio-toggle" class="primary" type="button">開始播放</button>
+    </header>
+
+    <main id="app" tabindex="-1"></main>
+
+    <footer class="transport" aria-label="全域播放控制">
+      <div class="now-playing">
+        <span class="status-dot" aria-hidden="true"></span>
+        <div><small>目前實驗</small><strong id="now-playing">尚未播放</strong></div>
+      </div>
+      <label class="volume-control">
+        <span>總音量</span>
+        <input id="master-volume" type="range" min="0" max="0.7" step="0.01" value="0.28" />
+        <output id="master-volume-value">28%</output>
+      </label>
+      <button id="stop-audio" class="quiet" type="button" disabled>停止</button>
+    </footer>
+
+    <template id="control-template">
+      <label class="control">
+        <span class="control-head"><b></b><output></output></span>
+        <input type="range" />
+      </label>
+    </template>
+
+    <script type="module" src="src/app.js"></script>
+  </body>
+</html>

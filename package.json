@@ -1,0 +1,11 @@
+{
+  "name": "double-ear-listening-lab",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/generate-radio-index.js",
+    "start": "node server.js",
+    "test": "node --test"
+  }
+}
