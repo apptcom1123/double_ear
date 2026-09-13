@@ -10,8 +10,7 @@ test('new texture catalogue has unique searchable cards', () => {
   assert.ok(cards.every(card => card.type.startsWith('texture-') && card.name && card.group && card.tags));
 });
 
-test('organic and bell cards expose the requested fixed variants', () => {
-  assert.equal(materials.find(item => item.id === 'frog-choir').variants.length, 4);
-  assert.equal(materials.find(item => item.id === 'mushroom-signals').variants.length, 5);
-  assert.equal(materials.find(item => item.id === 'bianzhong').variants.length, 4);
+test('each new texture family exposes at least five variants', () => {
+  const ids = ['cyber-dystopia','glitch-grains','vhs-lofi','geological','subatomic','frog-choir','mushroom-signals','bianzhong'];
+  assert.ok(ids.every(id => materials.find(item => item.id === id).variants.length >= 5));
 });

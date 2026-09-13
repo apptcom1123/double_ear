@@ -5,21 +5,25 @@ export const materials = [
   { id: 'nebula', name: '星雲和弦', group: 'SPACE', note: '緩慢漂浮的寬幅和弦', type: 'pad', wave: 'sine', notes: [0,7,14,19], root: 110 },
   { id: 'engine', name: '深空引擎', group: 'SPACE', note: '低頻持續音與緩慢脈動', type: 'pad', wave: 'triangle', notes: [0,7,12], root: 55 },
   { id: 'radar', name: '軌道雷達', group: 'SPACE', note: '左右回音的探測訊號', type: 'sequence', wave: 'sine', notes: [12,19,24,7], root: 440, division: .5 },
+  { id: 'comet-choir', name: '彗星合唱', group: 'SPACE', note: '高速掠過的泛音尾跡', type: 'sequence', wave: 'triangle', notes: [24,19,31,14], root: 220, division: .5, sweep: true },
+  { id: 'void-pulse', name: '虛空脈衝', group: 'SPACE', note: '低頻真空節拍與寬幅漂移', type: 'pad', wave: 'sine', notes: [0,5,12,17], root: 42 },
   { id: 'tape', name: '磁帶暖墊', group: 'RETRO', note: '微幅走音的類比合成器', type: 'pad', wave: 'sawtooth', notes: [0,4,7,12], root: 130.81 },
   { id: 'arcade', name: '像素街機', group: 'RETRO', note: '隨節拍跳動的方波序列', type: 'sequence', wave: 'square', notes: [0,12,7,19,4,16,7,12], root: 220, division: 2 },
   { id: 'laser', name: '復古雷射', group: 'RETRO', note: '下滑音高與延遲尾音', type: 'sequence', wave: 'sawtooth', notes: [12,7,19,0], root: 440, division: .5, sweep: true },
+  { id: 'crt-rain', name: 'CRT 雨幕', group: 'RETRO', note: '映像管高鳴與像素雨點', type: 'sequence', wave: 'square', notes: [24,31,19,28,16], root: 196, division: 2 },
+  { id: 'cassette-keys', name: '卡帶鍵群', group: 'RETRO', note: '溫暖失準的老鍵盤和弦', type: 'pad', wave: 'triangle', notes: [0,3,7,10], root: 146.83 },
   { id: 'frame-drum', name: '薩滿框鼓', group: 'SHAMAN', note: '深沉皮鼓與四拍呼吸', type: 'shaman-drum', tempo: true },
   { id: 'seed-rattle', name: '種籽沙鈴', group: 'SHAMAN', note: '細碎顆粒環繞移動', type: 'shaman-rattle', tempo: true },
   { id: 'overtone-chant', name: '泛音吟唱', group: 'SHAMAN', note: '低沉持續音與泛音漂移', type: 'shaman-drone' },
   { id: 'ritual-bell', name: '儀式金屬鈴', group: 'SHAMAN', note: '非整數泛音與長尾回聲', type: 'shaman-bell', tempo: true },
-  { id: 'cyber-dystopia', name: '反烏托邦低鳴', group: 'CYBER', note: '工業失真與機械低鳴', tags: '賽博龐克 霓虹 機械 industrial distortion', type: 'texture-cyber' },
-  { id: 'glitch-grains', name: '破碎微粒', group: 'GLITCH', note: '凍結與水晶數位碎片', tags: '故障 顆粒 grains freeze crystal', type: 'texture-glitch', tempo: true },
-  { id: 'vhs-lofi', name: 'VHS 暖霧', group: 'LO-FI', note: '錄音帶抖晃與高頻衰減', tags: '復古 懷舊 蒸汽波 wow flutter tape', type: 'texture-lofi' },
-  { id: 'geological', name: '地層共振', group: 'EARTH', note: '岩石摩擦、地震低鳴與洞穴回音', tags: '地質 礦物 岩石 洞穴 resonance cave', type: 'texture-geology' },
-  { id: 'subatomic', name: '次原子振盪', group: 'MICRO', note: '微小高速碰撞與昆蟲翼振', tags: '微觀 量子 原子 昆蟲 high frequency', type: 'texture-micro', tempo: true },
-  { id: 'frog-choir', name: '四蛙合唱', group: 'NATURE', note: '四種可切換的合成蛙鳴', tags: '蛙鳴 青蛙 池塘 frog', type: 'texture-frog', variants: [['bull','牛蛙'],['tree','樹蛙'],['rain','雨蛙'],['marsh','澤蛙']] },
+  { id: 'cyber-dystopia', name: '反烏托邦低鳴', group: 'CYBER', note: '五種工業失真與機械低鳴', tags: '賽博龐克 霓虹 機械 industrial distortion', type: 'texture-cyber', variants: [['neon','霓虹變壓器'],['factory','重工機床'],['siren','封鎖警報'],['drone','城底低鳴'],['storm','資料風暴']] },
+  { id: 'glitch-grains', name: '破碎微粒', group: 'GLITCH', note: '五種凍結與數位碎片', tags: '故障 顆粒 grains freeze crystal', type: 'texture-glitch', tempo: true, variants: [['freeze','冰結'],['crystal','水晶碎裂'],['buffer','緩衝錯誤'],['reverse','倒放切片'],['stutter','資料結巴']] },
+  { id: 'vhs-lofi', name: 'VHS 暖霧', group: 'LO-FI', note: '五種錄音帶懷舊質感', tags: '復古 懷舊 蒸汽波 wow flutter tape', type: 'texture-lofi', variants: [['vapor','蒸汽波'],['hiphop','Lo-Fi Hip-Hop'],['homevideo','家庭錄影'],['worn','磨損卡帶'],['dream','夢境 VHS']] },
+  { id: 'geological', name: '地層共振', group: 'EARTH', note: '五種岩層、礦物與洞穴聲景', tags: '地質 礦物 岩石 洞穴 resonance cave', type: 'texture-geology', variants: [['quake','地震低鳴'],['granite','花崗摩擦'],['cave','洞穴回聲'],['crystal','晶洞共振'],['magma','岩漿流動']] },
+  { id: 'subatomic', name: '次原子振盪', group: 'MICRO', note: '五種微觀高速動態', tags: '微觀 量子 原子 昆蟲 high frequency', type: 'texture-micro', tempo: true, variants: [['quantum','量子跳躍'],['collision','原子碰撞'],['wings','微型翼振'],['cell','細胞脈衝'],['spark','奈米火花']] },
+  { id: 'frog-choir', name: '蛙鳴群落', group: 'NATURE', note: '六種可切換的合成蛙鳴', tags: '蛙鳴 青蛙 池塘 frog', type: 'texture-frog', variants: [['bull','牛蛙'],['tree','樹蛙'],['rain','雨蛙'],['marsh','澤蛙'],['reed','葦澤蛙'],['glass','玻璃蛙']] },
   { id: 'mushroom-signals', name: '蘑菇訊號', group: 'BIO', note: '五種菌絲電訊號序列', tags: '蘑菇 菌絲 電磁 植物 mushroom', type: 'texture-mushroom', tempo: true, variants: [['mycelium','菌絲脈衝'],['spore','孢子雨'],['morel','羊肚菌碼'],['oyster','平菇波'],['glow','夜光菇']] },
-  { id: 'bianzhong', name: '四組編鐘', group: 'BELL', note: '四套固定音程與青銅泛音', tags: '編鐘 鐘磬 青銅 chinese bell', type: 'texture-bells', tempo: true, variants: [['gong','宮調'],['shang','商調'],['jue','角調'],['yu','羽調']] }
+  { id: 'bianzhong', name: '五組編鐘', group: 'BELL', note: '五套固定音程與青銅泛音', tags: '編鐘 鐘磬 青銅 chinese bell', type: 'texture-bells', tempo: true, variants: [['gong','宮調'],['shang','商調'],['jue','角調'],['zhi','徵調'],['yu','羽調']] }
 ];
 
 export class StudioEngine {
@@ -333,6 +337,7 @@ export class StudioEngine {
     const config = voice.materialConfig || {};
     const intensity = Math.max(.05, Math.min(1, config.materialIntensity ?? .5));
     const motion = Math.max(0, Math.min(1, config.materialMotion ?? .45));
+    const variant = config.materialVariant || material.variants?.[0]?.[0] || '';
     const random = seededRandom(811 + material.id.length * 37);
     const delay = ctx.createDelay(2), feedback = ctx.createGain(), wet = ctx.createGain();
     delay.delayTime.value = material.type === 'texture-geology' ? .62 : .19 + motion * .23;
@@ -351,28 +356,33 @@ export class StudioEngine {
       osc.connect(gain).connect(destination); osc.start(); voice.track(osc, gain); return osc;
     };
     if (material.type === 'texture-cyber') {
+      const profiles = { neon:[43.65,420,'sawtooth'], factory:[35,260,'square'], siren:[58,720,'sawtooth'], drone:[29,180,'triangle'], storm:[73,1200,'square'] };
+      const [root,cutoff,wave] = profiles[variant] || profiles.neon;
       const shaper = ctx.createWaveShaper(), filter = ctx.createBiquadFilter(), lfo = ctx.createOscillator(), sweep = ctx.createGain();
-      shaper.curve = curve(3 + intensity * 20); shaper.oversample = '4x'; filter.type = 'lowpass'; filter.frequency.value = 420 + intensity * 1050; filter.Q.value = 8;
+      shaper.curve = curve(3 + intensity * 20); shaper.oversample = '4x'; filter.type = 'lowpass'; filter.frequency.value = cutoff + intensity * 900; filter.Q.value = variant === 'siren' ? 14 : 8;
       lfo.frequency.value = .12 + motion * 1.2; sweep.gain.value = 180 + motion * 520; lfo.connect(sweep).connect(filter.frequency);
-      shaper.connect(filter).connect(bus); persistentTone(43.65,'sawtooth',.1,shaper,-8); persistentTone(55,'square',.055,shaper,7); lfo.start(); voice.track(shaper,filter,lfo,sweep); return;
+      shaper.connect(filter).connect(bus); persistentTone(root,wave,.1,shaper,-8); persistentTone(root*1.26,'square',.055,shaper,7); lfo.start(); voice.track(shaper,filter,lfo,sweep); return;
     }
     if (material.type === 'texture-lofi') {
-      const filter = ctx.createBiquadFilter(), shaper = ctx.createWaveShaper(); filter.type='lowpass'; filter.frequency.value=900+intensity*1700; shaper.curve=curve(1.5+intensity*3);
+      const profiles = { vapor:[110,1550,.12], hiphop:[98,1100,.2], homevideo:[130.81,1900,.32], worn:[82.41,720,.48], dream:[146.83,2300,.08] };
+      const [root,cutoff,wowRate] = profiles[variant] || profiles.vapor;
+      const filter = ctx.createBiquadFilter(), shaper = ctx.createWaveShaper(); filter.type='lowpass'; filter.frequency.value=cutoff+intensity*500; shaper.curve=curve(1.5+intensity*3);
       shaper.connect(filter).connect(bus); voice.track(filter,shaper);
-      [110,164.81,220].forEach((frequency,i)=>{ const osc=persistentTone(frequency,i===1?'triangle':'sawtooth',.035,shaper); const wow=ctx.createOscillator(),depth=ctx.createGain(); wow.frequency.value=.12+i*.07+motion*.18; depth.gain.value=5+motion*18; wow.connect(depth).connect(osc.detune); wow.start(); voice.track(wow,depth); }); return;
+      [1,1.5,2].forEach((ratio,i)=>{ const osc=persistentTone(root*ratio,i===1?'triangle':'sawtooth',.035,shaper); const wow=ctx.createOscillator(),depth=ctx.createGain(); wow.frequency.value=wowRate+i*.07+motion*.18; depth.gain.value=5+motion*18; wow.connect(depth).connect(osc.detune); wow.start(); voice.track(wow,depth); }); return;
     }
     if (material.type === 'texture-geology') {
-      const filter=ctx.createBiquadFilter(); filter.type='lowpass'; filter.frequency.value=160+intensity*260; filter.Q.value=9; filter.connect(bus); voice.track(filter);
-      persistentTone(28,'sine',.13,filter); persistentTone(41.2,'triangle',.055,filter);
+      const profiles = { quake:[28,160,9], granite:[43,360,5], cave:[35,240,13], crystal:[61,680,18], magma:[24,120,4] };
+      const [root,cutoff,q] = profiles[variant] || profiles.quake;
+      const filter=ctx.createBiquadFilter(); filter.type='lowpass'; filter.frequency.value=cutoff+intensity*160; filter.Q.value=q; filter.connect(bus); voice.track(filter);
+      persistentTone(root,'sine',.13,filter); persistentTone(root*1.47,'triangle',.055,filter);
       const buffer=ctx.createBuffer(1,ctx.sampleRate*2,ctx.sampleRate),data=buffer.getChannelData(0); let brown=0;
       for(let i=0;i<data.length;i++){brown=(brown+(random()*2-1)*.025)/1.025;data[i]=brown*2.6;}
       const source=ctx.createBufferSource(), gain=ctx.createGain();source.buffer=buffer;source.loop=true;gain.gain.value=.07+intensity*.07;source.connect(gain).connect(filter);source.start();voice.track(source,gain);return;
     }
-    const variant = config.materialVariant || material.variants?.[0]?.[0] || '';
     const profiles = {
-      bull:[95,1.7,.72], tree:[720,2.7,.24], rain:[430,3.5,.19], marsh:[260,2.2,.34]
+      bull:[95,1.7,.72], tree:[720,2.7,.24], rain:[430,3.5,.19], marsh:[260,2.2,.34], reed:[510,1.45,.16], glass:[980,2.15,.12]
     };
-    const bellSets = { gong:[261.63,329.63,392,523.25], shang:[293.66,369.99,440,587.33], jue:[329.63,415.3,493.88,659.25], yu:[392,493.88,587.33,783.99] };
+    const bellSets = { gong:[261.63,329.63,392,523.25], shang:[293.66,369.99,440,587.33], jue:[329.63,415.3,493.88,659.25], zhi:[349.23,440,523.25,698.46], yu:[392,493.88,587.33,783.99] };
     const mushroomSets = { mycelium:[0,7,12,19,24], spore:[24,19,31,14,26], morel:[0,3,10,6,17], oyster:[0,12,5,17,9], glow:[12,24,19,31,36] };
     let next=ctx.currentTime+.05, step=0;
     const burst=(frequency,time,duration,level,type='sine',endFrequency=frequency,pan=0)=>{
@@ -383,10 +393,12 @@ export class StudioEngine {
     };
     const schedule=()=>{while(voice.playing&&next<ctx.currentTime+.18){
       if(material.type==='texture-glitch'){
-        const duration=.012+random()*(.025+motion*.08), frequency=520+random()*5200;
-        burst(frequency,next,duration,.025+intensity*.065,random()>.5?'square':'sawtooth',frequency*(random()>.5?.4:1.8),random()*1.8-.9); next+=.025+random()*(.24-motion*.16);
+        const settings={freeze:[.12,900,.7],crystal:[.025,3200,1.8],buffer:[.055,1200,.55],reverse:[.09,1800,.35],stutter:[.018,650,1.2]}[variant]||[.06,1400,1];
+        const duration=.012+random()*(settings[0]+motion*.06), frequency=settings[1]+random()*4200;
+        burst(frequency,next,duration,.025+intensity*.065,random()>.5?'square':'sawtooth',frequency*(random()>.5?settings[2]:1/settings[2]),random()*1.8-.9); next+=.025+random()*(.24-motion*.16);
       } else if(material.type==='texture-micro'){
-        const frequency=2800+random()*7600;burst(frequency,next,.018+random()*.06,.018+intensity*.04,'sine',frequency*(.8+random()*.5),Math.sin(step++*1.7)*.9);next+=60/bpm/(3+motion*8);
+        const ranges={quantum:[2800,7600],collision:[900,4200],wings:[4200,3100],cell:[650,1800],spark:[7200,5200]}[variant]||[2800,7600];
+        const frequency=ranges[0]+random()*ranges[1];burst(frequency,next,.018+random()*.06,.018+intensity*.04,'sine',frequency*(.8+random()*.5),Math.sin(step++*1.7)*.9);next+=60/bpm/(3+motion*8);
       } else if(material.type==='texture-frog'){
         const [root,rate,duration]=profiles[variant]||profiles.bull;burst(root*(.92+random()*.12),next,duration,.06+intensity*.09,'sine',root*rate,Math.sin(step++*.9)*motion*.75);burst(root*1.04,next+.04,duration*.72,.025+intensity*.035,'square',root*rate*.82);next+=.65+(1-motion)*1.5+random()*.6;
       } else if(material.type==='texture-mushroom'){

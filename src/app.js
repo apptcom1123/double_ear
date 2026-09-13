@@ -2,7 +2,7 @@ import { AudioEngine } from "./audio-engine.js";
 import { arpeggioStyles, getPage, pages } from "./experiments.js";
 import { formatValue } from "./audio-utils.js";
 import { Studio } from './studio.js';
-import { Performance } from './performance.js';
+import { Performance } from './performance-workstation.js';
 
 const app = document.querySelector("#app");
 const nav = document.querySelector("#main-nav");
