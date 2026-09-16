@@ -10,7 +10,7 @@
 
 07 已擴充為手機演奏工作台：C2–C7 八度導覽、琴鍵縮放與橫移、Pitch／Mod／Sustain、觸控 Slide／Vibrato、調式鎖定、三／七和弦、三套和弦進行與自動琶音。音色庫有 10 種英文標示的電鋼琴、風琴、Lead、Pad 與 House Piano；Built-in FX 與效果量已收入 Instrument 旁的精簡控制列。2×4 鼓墊可切換 6 套鼓組與 New York Parallel、Bitcrusher、Transient、Reverse Reverb、Sidechain 等處理。電腦白鍵使用 `S D F G H J K L`，黑鍵使用 `E R Y U I`；也可觸發鼓墊、錄音、儲存與播放，動作皆可寫入 90 秒 JSON 時間軸。
 
-08 音檔工作台可匯入本機音檔並保存在瀏覽器 IndexedDB，不上傳伺服器。支援片段與效果時間區間、保音高變速、Key Shift、Reverse、三段 EQ、Delay、Reverb、3D 聲像、Telephone／Radio、淡入淡出、Grains、多層和聲、Freeze／Paulstretch 與 Vinyl／Lo-Fi。設定可作為專案儲存並在重新整理後還原。
+08 音檔工作台可匯入本機音檔並保存在瀏覽器 IndexedDB，不上傳伺服器。波形上有可直接拖曳的片段、FX 與 Freeze 起訖點；Reverse 會將完整選取區段由尾到頭播放。支援保音高變速、Key Shift、獨立全局三段 EQ、Delay、Reverb、3D 聲像、Telephone／Radio、淡入淡出、Grains、多層和聲、指定片段 Freeze、長微粒 Paulstretch 與 Vinyl／Lo-Fi。設定可作為專案儲存，處理結果可離線渲染並下載為立體聲 PCM WAV。
 
 混音室新增四種可疊加的薩滿聲景素材：框鼓、種籽沙鈴、泛音吟唱與儀式金屬鈴。它們可逐層開關與調整音量，節奏型素材跟隨主 BPM；「薩滿聲景」場景可一次載入四層，並支援 EQ、頻譜、收藏與循環播放。
 
