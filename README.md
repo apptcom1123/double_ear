@@ -8,7 +8,7 @@
 
 07 演奏台支援槽位開關／音量／長按更換、雙八度可縮放鍵盤，以及最長 90 秒的 JSON 操作錄製。錄製含初始基底快照與每個動作的毫秒時間，可在同頁儲存、重播、循環及匯出 JSON。操作以瀏覽器音訊時鐘重播，非取樣級自動化；不產生錄音檔。新資料分別保存在 `double-ear.cards.v1`、`double-ear.takes.v1`，既有收藏維持原 key。
 
-07 已擴充為手機演奏工作台：C2–C7 八度導覽、琴鍵縮放與橫移、Pitch／Mod／Sustain、觸控 Slide／Vibrato、調式鎖定、三／七和弦、三套和弦進行與自動琶音。音色庫有 10 種英文標示的電鋼琴、風琴、Lead、Pad 與 House Piano；2×4 鼓墊可切換 6 套鼓組與 New York Parallel、Bitcrusher、Transient、Reverse Reverb、Sidechain 等處理。電腦鍵盤可直接演奏、觸發鼓墊、錄音、儲存與播放，動作皆可寫入 90 秒 JSON 時間軸。
+07 已擴充為手機演奏工作台：C2–C7 八度導覽、琴鍵縮放與橫移、Pitch／Mod／Sustain、觸控 Slide／Vibrato、調式鎖定、三／七和弦、三套和弦進行與自動琶音。音色庫有 10 種英文標示的電鋼琴、風琴、Lead、Pad 與 House Piano；Built-in FX 與效果量已收入 Instrument 旁的精簡控制列。2×4 鼓墊可切換 6 套鼓組與 New York Parallel、Bitcrusher、Transient、Reverse Reverb、Sidechain 等處理。電腦白鍵使用 `S D F G H J K L`，黑鍵使用 `E R Y U I`；也可觸發鼓墊、錄音、儲存與播放，動作皆可寫入 90 秒 JSON 時間軸。
 
 08 音檔工作台可匯入本機音檔並保存在瀏覽器 IndexedDB，不上傳伺服器。支援片段與效果時間區間、保音高變速、Key Shift、Reverse、三段 EQ、Delay、Reverb、3D 聲像、Telephone／Radio、淡入淡出、Grains、多層和聲、Freeze／Paulstretch 與 Vinyl／Lo-Fi。設定可作為專案儲存並在重新整理後還原。
 
