@@ -3,6 +3,7 @@ import { arpeggioStyles, getPage, pages } from "./experiments.js";
 import { formatValue } from "./audio-utils.js";
 import { Studio } from './studio.js';
 import { Performance } from './performance-workstation.js';
+import { AudioLab } from './audio-lab.js';
 
 const app = document.querySelector("#app");
 const nav = document.querySelector("#main-nav");
@@ -17,6 +18,7 @@ let config = null;
 let restartTimer = null;
 const studio = new Studio((playing) => setPlayingUi(playing));
 const performanceDesk = new Performance((playing) => setPlayingUi(playing));
+const audioLab = new AudioLab((playing) => setPlayingUi(playing));
 
 const controlDefinitions = {
   carrier: { label: "基礎頻率", type: "range", min: 80, max: 900, step: .1, unit: " Hz" },
@@ -55,7 +57,7 @@ function renderHome() {
         <p>從聲音實驗到六張手牌混音，再把保存的基底帶上四槽演奏台。</p>
       </div>
       <aside class="listen-note">
-        <span class="number">01 → 07</span>
+        <span class="number">01 → 08</span>
         <p>第一次使用請從低音量開始。高頻提示音與快速空間移動都應短時間試聽。</p>
       </aside>
     </section>
@@ -95,6 +97,7 @@ function renderExperiment(page) {
   config = structuredClone(page.config);
   if (page.id === 'mixer') { studio.render(app); return; }
   if (page.id === 'perform') { performanceDesk.render(app); return; }
+  if (page.id === 'audio') { audioLab.render(app); return; }
   app.innerHTML = `
     <section class="hero">
       <div class="hero-copy"><div class="eyebrow">Experiment ${page.step}</div><h1>${page.title}</h1><p>${page.description}</p></div>
@@ -138,6 +141,7 @@ async function play() {
   try {
     if (activePage.id === 'mixer') { studio.setVolume(masterVolume.value); await studio.play(); return; }
     if (activePage.id === 'perform') { performanceDesk.setVolume(masterVolume.value); await performanceDesk.play(); return; }
+    if (activePage.id === 'audio') { audioLab.setVolume(masterVolume.value); await audioLab.play(); return; }
     engine.setVolume(masterVolume.value);
     await engine.start(config);
     setPlayingUi(true);
@@ -150,6 +154,7 @@ function stop() {
   clearTimeout(restartTimer);
   studio.stop();
   performanceDesk.stop();
+  audioLab.stop();
   engine.stop();
   setPlayingUi(false);
 }
@@ -198,6 +203,7 @@ function bindExperimentEvents() {
 
 function render() {
   performanceDesk.unmount();
+  audioLab.unmount();
   studio.equalizer?.destroy();
   clearTimeout(restartTimer);
   if (engine.playing || studio.playing) stop();
@@ -213,8 +219,9 @@ masterVolume.addEventListener("input", () => {
   engine.setVolume(masterVolume.value);
   studio.setVolume(masterVolume.value);
   performanceDesk.setVolume(masterVolume.value);
+  audioLab.setVolume(masterVolume.value);
   masterValue.textContent = `${Math.round(Number(masterVolume.value) * 100)}%`;
 });
 window.addEventListener("hashchange", render);
-window.addEventListener("beforeunload", () => { engine.stop(true); studio.stop(); performanceDesk.unmount(); });
+window.addEventListener("beforeunload", () => { engine.stop(true); studio.stop(); performanceDesk.unmount(); audioLab.unmount(); });
 render();

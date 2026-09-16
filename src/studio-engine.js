@@ -32,7 +32,27 @@ export const materials = [
   { id: 'frog-choir', name: '蛙鳴群落', group: 'NATURE', note: '六種可切換的合成蛙鳴', tags: '蛙鳴 青蛙 池塘 frog', type: 'texture-frog', variants: [['bull','牛蛙'],['tree','樹蛙'],['rain','雨蛙'],['marsh','澤蛙'],['reed','葦澤蛙'],['glass','玻璃蛙']] },
   { id: 'mushroom-signals', name: '蘑菇訊號', group: 'BIO', note: '五種菌絲電訊號序列', tags: '蘑菇 菌絲 電磁 植物 mushroom', type: 'texture-mushroom', tempo: true, variants: [['mycelium','菌絲脈衝'],['spore','孢子雨'],['morel','羊肚菌碼'],['oyster','平菇波'],['glow','夜光菇']] },
   { id: 'bianzhong', name: '五組編鐘', group: 'BELL', note: '五套固定音程與青銅泛音', tags: '編鐘 鐘磬 青銅 chinese bell', type: 'texture-bells', tempo: true, variants: [['gong','宮調'],['shang','商調'],['jue','角調'],['zhi','徵調'],['yu','羽調']] },
-  { id: 'traffic-stage', name: '交通舞台', group: 'TRAFFIC', note: '隨機車流、行人與緊急車輛的都卜勒循環', tags: '交通 汽車 機車 行人 救護車 警車 traffic car motorcycle pedestrian ambulance police doppler', type: 'texture-traffic', variants: [['mixed','混合街道'],['car','汽車'],['motorcycle','機車'],['pedestrian','行人'],['ambulance','救護車'],['police','警車']] }
+  { id: 'traffic-stage', name: '交通舞台', group: 'TRAFFIC', note: '隨機車流、行人與緊急車輛的都卜勒循環', tags: '交通 汽車 機車 行人 救護車 警車 traffic car motorcycle pedestrian ambulance police doppler', type: 'texture-traffic', variants: [['mixed','混合街道'],['car','汽車'],['motorcycle','機車'],['pedestrian','行人'],['ambulance','救護車'],['police','警車']] },
+  { id:'runway-glass',name:'Runway Glass',group:'FASHION',note:'透明伸展台和弦',tags:'時尚 秀場 runway fashion',type:'pad',wave:'sine',notes:[0,7,11,19],root:164.81 },
+  { id:'chrome-pulse',name:'Chrome Pulse',group:'FASHION',note:'金屬感節拍脈衝',tags:'時尚 金屬 chrome',type:'sequence',wave:'square',notes:[0,12,7,19,14],root:220,division:2,tempo:true },
+  { id:'silk-motion',name:'Silk Motion',group:'FASHION',note:'絲質柔滑漂移',tags:'時尚 絲質 ambient',type:'pad',wave:'triangle',notes:[0,4,9,16],root:146.83 },
+  { id:'editorial-flash',name:'Editorial Flash',group:'FASHION',note:'攝影棚閃光短音',tags:'時尚 攝影 閃光',type:'sequence',wave:'sawtooth',notes:[24,12,19,31,7],root:246.94,division:4,tempo:true },
+  { id:'couture-air',name:'Couture Air',group:'FASHION',note:'高級訂製空氣墊底',tags:'時尚 couture pad',type:'pad',wave:'sine',notes:[0,5,12,21],root:130.81 },
+  { id:'midnight-lounge',name:'Midnight Lounge',group:'BAR',note:'午夜爵士酒吧暖墊',tags:'酒吧 爵士 lounge',type:'pad',wave:'triangle',notes:[0,3,7,10],root:110 },
+  { id:'cocktail-chime',name:'Cocktail Chime',group:'BAR',note:'杯緣清脆碰響',tags:'酒吧 雞尾酒 杯子',type:'sequence',wave:'sine',notes:[12,19,24,31,16],root:261.63,division:1,tempo:true },
+  { id:'vinyl-booth',name:'Vinyl Booth',group:'BAR',note:'唱片 DJ 台低頻霧',tags:'酒吧 黑膠 DJ',type:'pad',wave:'sawtooth',notes:[0,7,10,15],root:82.41 },
+  { id:'neon-bourbon',name:'Neon Bourbon',group:'BAR',note:'霓虹威士忌節奏',tags:'酒吧 霓虹 bourbon',type:'sequence',wave:'triangle',notes:[0,5,8,12,17],root:174.61,division:2,tempo:true },
+  { id:'rooftop-haze',name:'Rooftop Haze',group:'BAR',note:'屋頂酒吧夜霧',tags:'酒吧 屋頂 夜景',type:'pad',wave:'sine',notes:[0,2,7,14],root:123.47 },
+  { id:'acid-tunnel',name:'Acid Tunnel',group:'CLUB',note:'酸性共振地下通道',tags:'夜店 acid club',type:'sequence',wave:'sawtooth',notes:[0,12,3,15,7,19],root:110,division:4,tempo:true },
+  { id:'laser-strobe',name:'Laser Strobe',group:'CLUB',note:'雷射與頻閃短音',tags:'夜店 雷射 strobe',type:'sequence',wave:'square',notes:[24,31,19,36,12],root:220,division:4,tempo:true },
+  { id:'warehouse-bass',name:'Warehouse Bass',group:'CLUB',note:'倉庫派對低頻牆',tags:'夜店 倉庫 bass',type:'pad',wave:'sawtooth',notes:[0,7,12],root:41.2 },
+  { id:'techno-relay',name:'Techno Relay',group:'CLUB',note:'工業科技接力節拍',tags:'夜店 techno industrial',type:'sequence',wave:'square',notes:[0,7,5,12,3,10],root:146.83,division:4,tempo:true },
+  { id:'trance-gate',name:'Trance Gate',group:'CLUB',note:'門控迷幻和弦',tags:'夜店 trance gate',type:'sequence',wave:'sawtooth',notes:[0,7,12,16,19,24],root:130.81,division:2,tempo:true },
+  { id:'disco-mirror',name:'Disco Mirror',group:'DANCE',note:'鏡球迪斯可反射',tags:'舞池 disco mirror',type:'sequence',wave:'sine',notes:[12,19,16,24,21],root:196,division:2,tempo:true },
+  { id:'house-lift',name:'House Lift',group:'DANCE',note:'浩室上升和弦',tags:'舞池 house piano',type:'pad',wave:'triangle',notes:[0,4,7,11,14],root:130.81 },
+  { id:'festival-drop',name:'Festival Drop',group:'DANCE',note:'大型舞台落拍提示',tags:'舞池 festival edm drop',type:'sequence',wave:'sawtooth',notes:[24,12,7,0,19,5],root:110,division:1,tempo:true,sweep:true },
+  { id:'ballroom-glow',name:'Ballroom Glow',group:'DANCE',note:'舞廳柔亮弦光',tags:'舞池 ballroom glow',type:'pad',wave:'sine',notes:[0,5,9,12,17],root:146.83 },
+  { id:'funk-floor',name:'Funk Floor',group:'DANCE',note:'切分放克舞步',tags:'舞池 funk groove',type:'sequence',wave:'square',notes:[0,7,10,5,12,3,15],root:164.81,division:4,tempo:true }
 ];
 
 export class StudioEngine {

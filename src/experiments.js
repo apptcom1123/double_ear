@@ -85,4 +85,5 @@ export const pages = [
 ];
 
 pages.push({ id: 'perform', step: '07', short: '演奏', title: '聲卡演奏台', summary: '四個基底聲卡槽、迷你鍵盤與 90 秒操作錄製。', config: { ...base } });
+pages.push({ id: 'audio', step: '08', short: '音檔', title: '音檔拆解與重組', summary: '匯入本機音檔，在時間區間內切片、變速、疊聲與空間化。', config: { ...base } });
 export const getPage = (id) => pages.find((page) => page.id === id) || pages[0];

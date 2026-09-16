@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { isScaleNote, scaleChord, degreeMidi, DRUMS, KITS, FX } from '../src/music-tools.js';
+import { isScaleNote, scaleChord, degreeMidi, DRUMS, KITS, DRUM_FX, INSTRUMENTS, FX } from '../src/music-tools.js';
 
 test('scale lock filters pitch classes and builds diatonic chords', () => {
   assert.equal(isScaleNote(61, 0, 'major'), false);
@@ -10,8 +10,10 @@ test('scale lock filters pitch classes and builds diatonic chords', () => {
   assert.equal(degreeMidi(3, 0, 'major', 4), 55);
 });
 
-test('workstation exposes sixteen drums, three kits and six effects', () => {
+test('workstation exposes expanded instruments, drums and effects', () => {
   assert.equal(DRUMS.length, 16);
-  assert.equal(Object.keys(KITS).length, 3);
+  assert.ok(Object.keys(KITS).length >= 6);
+  assert.ok(Object.keys(DRUM_FX).length >= 6);
+  assert.ok(Object.keys(INSTRUMENTS).length >= 10);
   assert.equal(Object.keys(FX).length, 6);
 });

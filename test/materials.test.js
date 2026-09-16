@@ -25,3 +25,7 @@ test('traffic stage spreads a bounded count through each cycle and applies physi
   assert.ok(ratio.approach > 1);
   assert.ok(ratio.recede < 1);
 });
+
+test('fashion, bar, club and dancefloor each contain five cards', () => {
+  for (const group of ['FASHION','BAR','CLUB','DANCE']) assert.equal(materials.filter(item => item.group === group).length, 5);
+});
